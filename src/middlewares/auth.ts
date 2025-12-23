@@ -12,7 +12,7 @@ export interface AuthRequest extends Request {
 
 export const authenticate = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   try {
@@ -43,7 +43,7 @@ export const authenticate = (
 
 export const requireAdmin = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   if (!req.user || req.user.role !== 'admin') {

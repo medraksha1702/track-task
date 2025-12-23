@@ -21,7 +21,7 @@ const allowedOrigins = process.env.CORS_ORIGIN
   : ['http://localhost:3000'];
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
@@ -36,12 +36,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 
 // Test database connection
-app.get('/health/db', async (req, res) => {
+app.get('/health/db', async (_req, res) => {
   try {
     await sequelize.authenticate();
     res.json({ status: 'ok', message: 'Database connection successful' });

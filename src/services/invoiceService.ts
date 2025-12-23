@@ -126,8 +126,9 @@ export const getInvoiceById = async (id: string) => {
   }
 
   // Fetch related service/machine details for each item
+  const items = (invoice as any).items as InvoiceItem[];
   const itemsWithDetails = await Promise.all(
-    invoice.items.map(async (item) => {
+    items.map(async (item) => {
       let details = null;
 
       if (item.itemType === 'service') {
@@ -206,8 +207,9 @@ export const deleteInvoice = async (id: string) => {
   }
 
   // Restore machine stock if invoice is deleted
+  const items = (invoice as any).items as InvoiceItem[];
   await sequelize.transaction(async (t) => {
-    for (const item of invoice.items) {
+    for (const item of items) {
       if (item.itemType === 'machine') {
         const machine = await Machine.findByPk(item.referenceId, { transaction: t });
         if (machine) {

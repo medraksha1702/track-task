@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as dashboardService from '../services/dashboardService';
 
 export const getDashboardStats = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -18,7 +18,7 @@ export const getDashboardStats = async (
 };
 
 export const getRevenueData = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {

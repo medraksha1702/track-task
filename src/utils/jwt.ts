@@ -10,9 +10,12 @@ export interface JWTPayload {
 }
 
 export const generateToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, {
+  if (!JWT_SECRET || JWT_SECRET === 'fallback-secret-key') {
+    throw new Error('JWT_SECRET is not configured');
+  }
+  return jwt.sign(payload, JWT_SECRET as string, {
     expiresIn: JWT_EXPIRES_IN,
-  });
+  } as jwt.SignOptions);
 };
 
 export const verifyToken = (token: string): JWTPayload => {
