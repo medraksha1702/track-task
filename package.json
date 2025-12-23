@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "db:create": "tsx database/create-db.ts",
+    "db:migrate": "tsx database/migrate.ts",
     "db:seed": "tsx database/seed.ts",
     "db:sync": "tsx -e \"import('./src/models').then(m => m.sequelize.sync({ alter: true }))\""
   },

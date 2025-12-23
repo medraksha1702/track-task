@@ -9,10 +9,12 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ Database connection established successfully.');
 
-    // Sync models (use { alter: true } in development, { force: false } in production)
-    if (process.env.NODE_ENV === 'development') {
+    // Sync models (use { alter: true } in development, or if AUTO_SYNC_DB is set)
+    if (process.env.NODE_ENV === 'development' || process.env.AUTO_SYNC_DB === 'true') {
       await sequelize.sync({ alter: true });
       console.log('✅ Database models synchronized.');
+    } else {
+      console.log('ℹ️  Auto-sync disabled. Run migrations manually if needed.');
     }
 
     const server = app.listen(PORT, () => {
