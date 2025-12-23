@@ -6,19 +6,21 @@ interface InvoiceAttributes {
   customerId: string;
   invoiceNumber: string;
   totalAmount: number;
+  paidAmount: number;
   paymentStatus: string;
   invoiceDate: Date;
   dueDate: Date | null;
   createdAt?: Date;
 }
 
-interface InvoiceCreationAttributes extends Optional<InvoiceAttributes, 'id' | 'paymentStatus' | 'dueDate' | 'createdAt'> {}
+interface InvoiceCreationAttributes extends Optional<InvoiceAttributes, 'id' | 'paymentStatus' | 'dueDate' | 'createdAt' | 'paidAmount'> {}
 
 class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes> implements InvoiceAttributes {
   public id!: string;
   public customerId!: string;
   public invoiceNumber!: string;
   public totalAmount!: number;
+  public paidAmount!: number;
   public paymentStatus!: string;
   public invoiceDate!: Date;
   public dueDate!: Date | null;
@@ -47,6 +49,12 @@ class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes> implem
           type: DataTypes.DECIMAL(10, 2),
           allowNull: false,
           field: 'total_amount',
+        },
+        paidAmount: {
+          type: DataTypes.DECIMAL(10, 2),
+          allowNull: false,
+          defaultValue: 0,
+          field: 'paid_amount',
         },
         paymentStatus: {
           type: DataTypes.STRING,

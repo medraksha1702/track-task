@@ -70,13 +70,14 @@ export const updateInvoice = async (
 };
 
 export const updatePaymentStatus = async (
-  req: Request<{ id: string }, {}, { paymentStatus: 'paid' | 'unpaid' | 'partial' }>,
+  req: Request<{ id: string }, {}, { paymentStatus: 'paid' | 'unpaid' | 'partial'; paidAmount?: number }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const invoice = await invoiceService.updateInvoice(req.params.id, {
       paymentStatus: req.body.paymentStatus,
+      paidAmount: req.body.paidAmount,
     });
     res.status(200).json({
       success: true,

@@ -26,6 +26,9 @@ Service.belongsTo(Machine, { foreignKey: 'machineId', as: 'machine' });
 
 Invoice.hasMany(InvoiceItem, { foreignKey: 'invoiceId', as: 'items' });
 InvoiceItem.belongsTo(Invoice, { foreignKey: 'invoiceId', as: 'invoice' });
+// Link services to invoice items for lookups
+Service.hasMany(InvoiceItem, { foreignKey: 'referenceId', constraints: false, scope: { itemType: 'service' }, as: 'invoiceItems' });
+InvoiceItem.belongsTo(Service, { foreignKey: 'referenceId', constraints: false, as: 'service' });
 
 export {
   sequelize,

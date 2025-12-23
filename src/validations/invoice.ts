@@ -19,6 +19,7 @@ export const createInvoiceSchema = z.object({
 export const updateInvoiceSchema = z.object({
   body: z.object({
     paymentStatus: z.enum(['paid', 'unpaid', 'partial']).optional(),
+    paidAmount: z.number().nonnegative('Paid amount must be >= 0').optional(),
     dueDate: z.string().datetime('Invalid due date').optional(),
   }),
   params: z.object({
@@ -45,6 +46,7 @@ export const updatePaymentStatusSchema = z.object({
   }),
   body: z.object({
     paymentStatus: z.enum(['paid', 'unpaid', 'partial']),
+    paidAmount: z.number().nonnegative('Paid amount must be >= 0').optional(),
   }),
 });
 

@@ -63,6 +63,7 @@ export const createInvoice = async (input: CreateInvoiceInput) => {
         customerId: input.customerId,
         invoiceNumber,
         totalAmount,
+        paidAmount: 0,
         invoiceDate: new Date(input.invoiceDate),
         dueDate: input.dueDate ? new Date(input.dueDate) : null,
         paymentStatus: 'unpaid',
@@ -182,7 +183,49 @@ export const updateInvoice = async (id: string, input: UpdateInvoiceInput) => {
   }
 
   const updateData: any = {};
-  if (input.paymentStatus) updateData.paymentStatus = input.paymentStatus;
+  if (input.paymentStatus) {
+    const currentTotal = Number(invoice.totalAmount);
+    const paidAmountInput = input.paidAmount ?? Number(invoice.paidAmount ?? 0);
+
+    if (input.paymentStatus === 'paid') {
+      updateData.paymentStatus = 'paid';
+      updateData.paidAmount = currentTotal;
+    } else if (input.paymentStatus === 'unpaid') {
+      updateData.paymentStatus = 'unpaid';
+      updateData.paidAmount = 0;
+    } else if (input.paymentStatus === 'partial') {
+      if (input.paidAmount === undefined) {
+        throw new BadRequestError('paidAmount is required when setting status to partial');
+      }
+      if (input.paidAmount < 0) {
+        throw new BadRequestError('paidAmount cannot be negative');
+      }
+      if (input.paidAmount >= currentTotal) {
+        throw new BadRequestError('paidAmount must be less than totalAmount for partial status');
+      }
+      updateData.paymentStatus = 'partial';
+      updateData.paidAmount = input.paidAmount;
+    }
+  }
+
+  if (input.paidAmount !== undefined && !input.paymentStatus) {
+    // Allow direct paidAmount updates by deriving status
+    const newPaid = input.paidAmount;
+    const currentTotal = Number(invoice.totalAmount);
+    if (newPaid < 0) {
+      throw new BadRequestError('paidAmount cannot be negative');
+    }
+    if (newPaid === 0) {
+      updateData.paymentStatus = 'unpaid';
+    } else if (newPaid >= currentTotal) {
+      updateData.paymentStatus = 'paid';
+      updateData.paidAmount = currentTotal;
+    } else {
+      updateData.paymentStatus = 'partial';
+      updateData.paidAmount = newPaid;
+    }
+  }
+
   if (input.dueDate) updateData.dueDate = new Date(input.dueDate);
 
   await invoice.update(updateData);

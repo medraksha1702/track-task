@@ -98,8 +98,45 @@ export const getAllServices = async (
     ],
   });
 
+  // Fetch invoice/payment info for these services in bulk
+  const serviceIds = services.map((s) => s.id);
+  let paymentMap: Record<
+    string,
+    { paymentStatus: string; paidAmount: number; totalAmount: number }
+  > = {};
+
+  if (serviceIds.length > 0) {
+    const invoiceItems = await InvoiceItem.findAll({
+      where: {
+        itemType: 'service',
+        referenceId: serviceIds,
+      },
+      include: [{ model: Invoice, as: 'invoice' }],
+    });
+
+    paymentMap = invoiceItems.reduce((acc, item: any) => {
+      if (item.invoice) {
+        acc[item.referenceId] = {
+          paymentStatus: item.invoice.paymentStatus,
+          paidAmount: Number(item.invoice.paidAmount || 0),
+          totalAmount: Number(item.invoice.totalAmount || 0),
+        };
+      }
+      return acc;
+    }, {} as Record<string, { paymentStatus: string; paidAmount: number; totalAmount: number }>);
+  }
+
+  const servicesWithPayment = services.map((service) => {
+    const json = service.toJSON() as any;
+    const pay = paymentMap[service.id];
+    return {
+      ...json,
+      paymentInfo: pay || null,
+    };
+  });
+
   return {
-    services,
+    services: servicesWithPayment,
     pagination: {
       page,
       limit,
