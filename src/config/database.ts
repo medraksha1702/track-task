@@ -11,11 +11,13 @@ const getDatabaseConfig = () => {
     // Parse PostgreSQL URL: postgresql://user:password@host:port/database
     try {
       const url = new URL(databaseUrl);
+      // Decode URL-encoded password and ensure it's always a string
+      const password = url.password ? decodeURIComponent(url.password) : '';
       return {
         database: url.pathname.slice(1), // Remove leading '/'
-        username: url.username,
-        password: url.password,
-        host: url.hostname,
+        username: url.username || 'postgres',
+        password: String(password), // Ensure password is always a string
+        host: url.hostname || 'localhost',
         port: parseInt(url.port) || 5432,
         dialect: 'postgres' as const,
       };
@@ -28,7 +30,7 @@ const getDatabaseConfig = () => {
   return {
     database: process.env.DB_NAME || 'biomedical_service',
     username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '',
+    password: String(process.env.DB_PASSWORD || ''), // Ensure password is always a string
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     dialect: 'postgres' as const,
