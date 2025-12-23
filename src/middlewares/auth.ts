@@ -8,6 +8,7 @@ export interface AuthRequest extends Request {
     email: string;
     role: string;
   };
+  headers: Request['headers'];
 }
 
 export const authenticate = (
