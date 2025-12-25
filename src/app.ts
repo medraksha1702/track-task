@@ -7,6 +7,8 @@ import machineRoutes from './routes/machineRoutes';
 import serviceRoutes from './routes/serviceRoutes';
 import invoiceRoutes from './routes/invoiceRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
+import reportRoutes from './routes/reportRoutes';
+import amcRoutes from './routes/amcRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import { sequelize } from './models';
 
@@ -57,6 +59,8 @@ app.use('/api/machines', machineRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/amcs', amcRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

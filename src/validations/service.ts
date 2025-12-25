@@ -4,6 +4,7 @@ export const createServiceSchema = z.object({
   body: z.object({
     customerId: z.string().uuid('Invalid customer ID'),
     machineId: z.string().uuid('Invalid machine ID').optional().or(z.literal('')),
+    amcId: z.string().uuid('Invalid AMC ID').optional().or(z.literal('')),
     serviceType: z.enum(['repair', 'maintenance', 'installation']),
     description: z.string().optional().or(z.literal('')),
     status: z.enum(['pending', 'in_progress', 'completed']).default('pending'),
@@ -16,6 +17,7 @@ export const updateServiceSchema = z.object({
   body: z.object({
     customerId: z.string().uuid('Invalid customer ID').optional(),
     machineId: z.string().uuid('Invalid machine ID').optional().or(z.literal('')),
+    amcId: z.string().uuid('Invalid AMC ID').optional().or(z.literal('')),
     serviceType: z.enum(['repair', 'maintenance', 'installation']).optional(),
     description: z.string().optional().or(z.literal('')),
     status: z.enum(['pending', 'in_progress', 'completed']).optional(),

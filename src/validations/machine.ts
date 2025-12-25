@@ -8,7 +8,7 @@ export const createMachineSchema = z.object({
     purchasePrice: z.number().positive('Purchase price must be positive'),
     sellingPrice: z.number().positive('Selling price must be positive'),
     stockQuantity: z.number().int().min(0).default(0),
-    status: z.enum(['available', 'sold', 'under_service']).default('available'),
+    status: z.enum(['available', 'sold']).default('available'),
   }),
 });
 
@@ -20,7 +20,7 @@ export const updateMachineSchema = z.object({
     purchasePrice: z.number().positive('Purchase price must be positive').optional(),
     sellingPrice: z.number().positive('Selling price must be positive').optional(),
     stockQuantity: z.number().int().min(0).optional(),
-    status: z.enum(['available', 'sold', 'under_service']).optional(),
+    status: z.enum(['available', 'sold']).optional(),
   }),
   params: z.object({
     id: z.string().uuid('Invalid machine ID'),
@@ -35,7 +35,7 @@ export const getMachineSchema = z.object({
 
 export const searchMachinesSchema = z.object({
   query: z.object({
-    status: z.enum(['available', 'sold', 'under_service']).optional(),
+    status: z.enum(['available', 'sold']).optional(),
     page: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),
     limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 10)),
   }),

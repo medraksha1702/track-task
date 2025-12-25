@@ -70,6 +70,11 @@ export const updateMachine = async (id: string, input: UpdateMachineInput) => {
     throw new NotFoundError('Machine not found');
   }
 
+  // Prevent direct status change to 'sold' - must be done through invoice creation
+  if (input.status === 'sold' && machine.status !== 'sold') {
+    throw new BadRequestError('Cannot mark machine as sold directly. Please create an invoice to sell this machine.');
+  }
+
   const updateData: any = {};
   if (input.name) updateData.name = input.name;
   if (input.model !== undefined) updateData.model = input.model || null;
@@ -77,7 +82,7 @@ export const updateMachine = async (id: string, input: UpdateMachineInput) => {
   if (input.purchasePrice !== undefined) updateData.purchasePrice = input.purchasePrice;
   if (input.sellingPrice !== undefined) updateData.sellingPrice = input.sellingPrice;
   if (input.stockQuantity !== undefined) updateData.stockQuantity = input.stockQuantity;
-  if (input.status) updateData.status = input.status;
+  if (input.status && input.status !== 'sold') updateData.status = input.status;
 
   await machine.update(updateData);
 

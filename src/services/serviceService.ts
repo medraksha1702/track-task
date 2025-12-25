@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Service, Customer, Machine, Invoice, InvoiceItem, sequelize } from '../models';
+import { Service, Customer, Machine, Invoice, InvoiceItem, AMC, sequelize } from '../models';
 import { NotFoundError } from '../utils/errors';
 import { CreateServiceInput, UpdateServiceInput } from '../validations/service';
 
@@ -20,9 +20,19 @@ export const createService = async (input: CreateServiceInput) => {
     }
   }
 
+  // Verify AMC exists if provided
+  if (input.amcId) {
+    const amc = await AMC.findByPk(input.amcId);
+
+    if (!amc) {
+      throw new NotFoundError('AMC not found');
+    }
+  }
+
   const service = await Service.create({
     customerId: input.customerId,
     machineId: input.machineId || null,
+    amcId: input.amcId || null,
     serviceType: input.serviceType,
     description: input.description || null,
     status: input.status || 'pending',
@@ -34,6 +44,7 @@ export const createService = async (input: CreateServiceInput) => {
     include: [
       { model: Customer, as: 'customer' },
       { model: Machine, as: 'machine' },
+      { model: AMC, as: 'amc' },
     ],
   });
 
@@ -45,6 +56,7 @@ export const getServiceById = async (id: string) => {
     include: [
       { model: Customer, as: 'customer' },
       { model: Machine, as: 'machine' },
+      { model: AMC, as: 'amc' },
     ],
   });
 
@@ -95,6 +107,7 @@ export const getAllServices = async (
     include: [
       { model: Customer, as: 'customer' },
       { model: Machine, as: 'machine' },
+      { model: AMC, as: 'amc' },
     ],
   });
 
@@ -243,6 +256,7 @@ export const updateService = async (id: string, input: UpdateServiceInput) => {
     include: [
       { model: Customer, as: 'customer' },
       { model: Machine, as: 'machine' },
+      { model: AMC, as: 'amc' },
     ],
   });
 
@@ -268,9 +282,19 @@ export const updateService = async (id: string, input: UpdateServiceInput) => {
     }
   }
 
+  // Verify AMC exists if updating
+  if (input.amcId) {
+    const amc = await AMC.findByPk(input.amcId);
+
+    if (!amc) {
+      throw new NotFoundError('AMC not found');
+    }
+  }
+
   const updateData: any = {};
   if (input.customerId) updateData.customerId = input.customerId;
   if (input.machineId !== undefined) updateData.machineId = input.machineId || null;
+  if (input.amcId !== undefined) updateData.amcId = input.amcId || null;
   if (input.serviceType) updateData.serviceType = input.serviceType;
   if (input.description !== undefined) updateData.description = input.description || null;
   
@@ -287,6 +311,7 @@ export const updateService = async (id: string, input: UpdateServiceInput) => {
     include: [
       { model: Customer, as: 'customer' },
       { model: Machine, as: 'machine' },
+      { model: AMC, as: 'amc' },
     ],
   });
 

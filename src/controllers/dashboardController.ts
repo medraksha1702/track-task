@@ -2,12 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import * as dashboardService from '../services/dashboardService';
 
 export const getDashboardStats = async (
-  _req: Request,
+  req: Request<{}, {}, {}, { startDate?: string; endDate?: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const stats = await dashboardService.getDashboardStats();
+    const { startDate, endDate } = req.query;
+    const stats = await dashboardService.getDashboardStats(startDate, endDate);
     res.status(200).json({
       success: true,
       data: stats,
@@ -18,12 +19,13 @@ export const getDashboardStats = async (
 };
 
 export const getRevenueData = async (
-  _req: Request,
+  req: Request<{}, {}, {}, { startDate?: string; endDate?: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const revenue = await dashboardService.getRevenueData();
+    const { startDate, endDate } = req.query;
+    const revenue = await dashboardService.getRevenueData(startDate, endDate);
     res.status(200).json({
       success: true,
       data: revenue,

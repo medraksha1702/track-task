@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import * as invoiceService from '../services/invoiceService';
 import { CreateInvoiceInput, UpdateInvoiceInput } from '../validations/invoice';
+import { generateInvoicePDF } from '../services/pdfService';
+import { sendInvoiceEmail } from '../services/emailService';
+import { Invoice, Customer } from '../models';
 
 export const createInvoice = async (
   req: Request<{}, {}, CreateInvoiceInput>,
@@ -98,6 +101,70 @@ export const deleteInvoice = async (
     res.status(200).json({
       success: true,
       data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downloadInvoicePDF = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const pdfBuffer = await generateInvoicePDF(req.params.id);
+    
+    const invoice = await Invoice.findByPk(req.params.id);
+    const filename = `Invoice-${invoice?.invoiceNumber || req.params.id}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const emailInvoice = async (
+  req: Request<{ id: string }, {}, { email?: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const invoice = await Invoice.findByPk(req.params.id, {
+      include: [{ model: Customer, as: 'customer' }],
+    });
+
+    if (!invoice) {
+      res.status(404).json({
+        success: false,
+        error: { message: 'Invoice not found' },
+      });
+      return;
+    }
+
+    const customer = (invoice as any).customer;
+    const recipientEmail = req.body.email || customer.email;
+
+    if (!recipientEmail) {
+      res.status(400).json({
+        success: false,
+        error: { message: 'No email address provided' },
+      });
+      return;
+    }
+
+    await sendInvoiceEmail(
+      req.params.id,
+      recipientEmail,
+      customer.name,
+      invoice.invoiceNumber
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Invoice sent successfully to ${recipientEmail}`,
     });
   } catch (error) {
     next(error);

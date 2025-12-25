@@ -18,6 +18,8 @@ router.use(authenticate);
 router.post('/', validate(createInvoiceSchema), invoiceController.createInvoice);
 router.get('/', validate(searchInvoicesSchema), invoiceController.getAllInvoices);
 router.get('/:id', validate(getInvoiceSchema), invoiceController.getInvoice);
+router.get('/:id/pdf', validate(getInvoiceSchema), invoiceController.downloadInvoicePDF);
+router.post('/:id/email', validate(getInvoiceSchema), invoiceController.emailInvoice);
 router.put('/:id', validate(updateInvoiceSchema), invoiceController.updateInvoice);
 router.patch('/:id/payment-status', validate(updatePaymentStatusSchema), invoiceController.updatePaymentStatus);
 router.delete('/:id', validate(getInvoiceSchema), invoiceController.deleteInvoice);

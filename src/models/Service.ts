@@ -5,6 +5,7 @@ interface ServiceAttributes {
   id: string;
   customerId: string;
   machineId: string | null;
+  amcId: string | null;
   serviceType: string;
   description: string | null;
   status: string;
@@ -13,12 +14,13 @@ interface ServiceAttributes {
   createdAt?: Date;
 }
 
-interface ServiceCreationAttributes extends Optional<ServiceAttributes, 'id' | 'machineId' | 'description' | 'status' | 'cost' | 'createdAt'> {}
+interface ServiceCreationAttributes extends Optional<ServiceAttributes, 'id' | 'machineId' | 'amcId' | 'description' | 'status' | 'cost' | 'createdAt'> {}
 
 class Service extends Model<ServiceAttributes, ServiceCreationAttributes> implements ServiceAttributes {
   public id!: string;
   public customerId!: string;
   public machineId!: string | null;
+  public amcId!: string | null;
   public serviceType!: string;
   public description!: string | null;
   public status!: string;
@@ -43,6 +45,11 @@ class Service extends Model<ServiceAttributes, ServiceCreationAttributes> implem
           type: DataTypes.UUID,
           allowNull: true,
           field: 'machine_id',
+        },
+        amcId: {
+          type: DataTypes.UUID,
+          allowNull: true,
+          field: 'amc_id',
         },
         serviceType: {
           type: DataTypes.STRING,
